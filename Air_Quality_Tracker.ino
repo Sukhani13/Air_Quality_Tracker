@@ -80,4 +80,45 @@ webpage += "</h2></p></body>";
      sendData(closeCommand,3000,DEBUG);
     }
   }
-
+lcd.setCursor (0, 0);
+lcd.print ("Air Quality is ");
+lcd.print (air_quality);
+lcd.print (" PPM ");lcd.setCursor (0,1);
+if (air_quality<=1000)
+{
+lcd.print("Fresh Air");
+digitalWrite(8, LOW);
+}
+else if( air_quality>=1000 && air_quality<=2000 )
+{
+lcd.print("Poor Air, Open Windows");
+digitalWrite(8, HIGH );
+}
+else if (air_quality>=2000 )
+{
+lcd.print("Danger! Move to Fresh Air");
+digitalWrite(8, HIGH);   // turn the LED on
+}
+lcd.scrollDisplayLeft();
+delay(1000);
+}
+String sendData(String command, const int timeout, boolean debug)
+{
+    String response = ""; 
+    esp8266.print(command); // send the read character to the esp8266
+    long int time = millis();
+    while( (time+timeout) > millis())
+    {
+      while(esp8266.available())
+      {
+        // The esp has data so display its output to the serial window 
+        char c = esp8266.read(); // read the next character.
+        response+=c;
+      }  
+    }
+    if(debug)
+    {
+      Serial.print(response);
+    }
+    return response;
+}
